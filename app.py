@@ -3,6 +3,8 @@ from typing import TypedDict, List, Optional, Dict, Any
 
 import streamlit as st
 
+from langchain_openai import ChatOpenAI
+
 st.set_page_config(page_title="인공지능 JSON 에디터", layout="wide")
 st.title("🧩 인공지능 JSON 에디터")
 st.caption("자연어 지시 → RFC6902 패치 생성 → JSON Patch 도구 적용")
@@ -40,3 +42,25 @@ def validate_patch_ops(ops: Any) -> Optional[str]:
         if op["op"] in ("move", "copy") and "from" not in op:
             return f"{i}번째 '{op['op']}' 연산에 'from'이 없습니다."
     return None
+
+# 사이트바 및 llm 설정
+with st.sidebar:
+    st.header("LLM 모델")
+    model_name = st.selectbox(
+        "사용할 LLM 모델",
+        (
+            "gpt-4.1-2025-04-14",
+            "gpt-4.1-mini-2025-04-14",
+            "gpt-4.1-nano-2025-04-14"
+        ),
+        index=1
+    )
+    temperature = st.slider("Temperature", 0.0, 1.0, 0.2, 0.1)
+
+# llm생성 함수
+def build_llm():
+    return ChatOpenAI(
+        api_key=st.secrets["OPENAI_API_KEY"],
+        model=model_name,
+        temperature=temperature
+    )
