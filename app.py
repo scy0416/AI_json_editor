@@ -191,7 +191,7 @@ with left:
     }
     uploaded = st.file_uploader("JSON 업로드(옵션)", type=["json"])
     if "src_text" not in st.session_state:
-        st.session_state.src_text = json.dumps(default_json, ensure_ascii=False, indents=2)
+        st.session_state.src_text = json.dumps(default_json, ensure_ascii=False, indent=2)
 
     if uploaded:
         st.session_state.src_text = uploaded.read().decode("utf-8")
