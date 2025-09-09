@@ -96,3 +96,25 @@ prompt_template = ChatPromptTemplate.from_messages([
     SystemMessage(system_prompt),
     HumanMessagePromptTemplate.from_template(human_prompt)
 ])
+
+# json 패치 생성 노드
+def generate_patch(state: AppState) -> AppState:
+    try:
+        llm = build_llm()
+        if llm is None:
+            return {"error": "API 키가 없어 패치를 생성할 수 없습니다."}
+
+        src_json = json.dumps(state["src"], ensure_ascii=False, indent=2)
+        chain = prompt_template | llm
+        resp = chain.invoke({"instruction": state["instruction"], "src_json": src_json})
+        raw = resp.content or ""
+        cleaned = strip_code_fences(raw)
+
+        ops = safe_json_loads(cleaned)
+        err = validate_patch_ops(ops)
+        if err:
+            return {"error": f"패치 유효성 오류: {err}", "debug": {"raw": raw, "cleaned": cleaned}}
+
+        return {"patch_ops": ops, "debug": {"raw": raw, "cleaned": cleaned}}
+    except Exception as e:
+        return {"error": f"패치 생성 실패: {e}", "debug": {"trace": traceback.format_exc()}}
