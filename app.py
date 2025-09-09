@@ -1,6 +1,7 @@
 import json, re, traceback
 from typing import TypedDict, List, Optional, Dict, Any
 
+import jsonpatch
 import streamlit as st
 
 from langchain_core.prompts import (
@@ -9,6 +10,10 @@ from langchain_core.prompts import (
 )
 from langchain_core.messages import SystemMessage
 from langchain_openai import ChatOpenAI
+
+import jsonpatch
+from jsonpointer import JsonPointerException
+from jsonpatch import JsonPatchConflict
 
 st.set_page_config(page_title="인공지능 JSON 에디터", layout="wide")
 st.title("🧩 인공지능 JSON 에디터")
@@ -126,3 +131,17 @@ def judge(state: AppState) -> AppState:
     if not state.get("patch_ops"):
         return {"error": "생성된 패치가 없습니다."}
     return state
+
+# json 패치 적용 노드
+def apply_patch(state: AppState) -> AppState:
+    try:
+        patched = jsonpatch.apply_patch(
+            state["src"],
+            state["patch_ops"],
+            in_place=False
+        )
+        return {"result": patched}
+    except (JsonPatchConflict, JsonPointerException, ValueError) as e:
+        return {"error": f"패치 적용 실패: {e}"}
+    except Exception as e:
+        return {"error": f"알 수 없는 적용 오류: {e}", "debug": {"trace": traceback.format_exc()}}
