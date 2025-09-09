@@ -3,6 +3,11 @@ from typing import TypedDict, List, Optional, Dict, Any
 
 import streamlit as st
 
+from langchain_core.prompts import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate
+)
+from langchain_core.messages import SystemMessage
 from langchain_openai import ChatOpenAI
 
 st.set_page_config(page_title="인공지능 JSON 에디터", layout="wide")
@@ -64,3 +69,30 @@ def build_llm():
         model=model_name,
         temperature=temperature
     )
+
+# 시스템 프롬프트
+system_prompt = (
+    "너는 RFC 6902(JSON Patch) 전문가다. 사용자의 지시를 바탕으로 "
+    "주어진 '현재 JSON'을 수정하기 위한 JSON Patch 연산 배열만 정확히 출력해라. "
+    "설명이나 코드펜스 없어 오직 유효한 JSON 배열만 출력한다. "
+    "경로는 RFC 6901(JSON Pointer)을 따르고, 필요한 경우 특수문자 이스케이프(~0, ~1)을 사용하라. "
+    "가능한 최소 연산으로 작성하고, 배열 끝 추가 시 /- 를 사용한다."
+)
+
+# 사용자 프롬프트
+human_prompt = """
+사용자 지시: {instruction}
+
+현재 JSON:
+```json
+{src_json}
+```
+
+출력 형식: **RFC6902 operations array만**
+예: [{"op":"replace","path":"/a","value":1}]
+"""
+
+prompt_template = ChatPromptTemplate.from_messages([
+    SystemMessage(system_prompt),
+    HumanMessagePromptTemplate.from_template(human_prompt)
+])
