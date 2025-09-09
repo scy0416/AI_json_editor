@@ -204,7 +204,7 @@ with left:
 
     st.subheader("2) 자연어 지시")
     instruction = st.text_area("예) 이름을 Bob으로 바꾸고, tags 끝에 'z'를 추가하고, age를 profile/age로 이동해줘.",
-                               hwight=120,
+                               height=120,
                                value="이름을 Bob으로 바꾸고, tags 끝에 'z'를 추가하고, age를 profile/age로 이동해줘.")
 
     run = st.button("🚀 패치 생성 & 적용")
