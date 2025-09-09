@@ -177,3 +177,27 @@ def build_graph():
 
 # 그래프 생성
 graph = build_graph()
+
+# streamlit UI 영역
+left, right = st.columns([0.5, 0.5])
+
+with left:
+    st.subheader("1) 원본 JSON")
+    default_json = {
+        "name": "Alice",
+        "age": 20,
+        "tags": ["x", "y"],
+        "profile": {"city", "Seoul"}
+    }
+    uploaded = st.file_uploader("JSON 업로드(옵션)", type=["json"])
+    if "src_text" not in st.session_state:
+        st.session_state.src_text = json.dumps(default_json, ensure_ascii=False, indents=2)
+
+    if uploaded:
+        st.session_state.src_text = uploaded.read().decode("utf-8")
+
+    src_text = st.text_area(
+        "편집 가능",
+        st.session_state.src_text,
+        height=260
+    )
