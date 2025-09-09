@@ -1,3 +1,4 @@
+import json, re, traceback
 from typing import TypedDict, List, Optional, Dict, Any
 
 import streamlit as st
@@ -14,3 +15,11 @@ class AppState(TypedDict, total=False):
     result: Dict[str, Any]          # 패치 적용 결과
     error: Optional[str]            # 에러 메시지
     debug: Dict[str, Any]           # 디버그
+
+# 코드 블럭에서 JSON 추출 함수
+def strip_code_fences(text: str) -> str:
+    text = text.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json|JSON)?\s*", "", text)
+        text = re.sub(f"\s*```$", "", text)
+    return text.strip()
