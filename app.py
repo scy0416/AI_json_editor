@@ -86,11 +86,11 @@ system_prompt = (
 
 # 사용자 프롬프트
 human_prompt = """
-사용자 지시: {instruction}
+사용자 지시: {{ instruction }}
 
 현재 JSON:
 ```json
-{src_json}
+{{ src_json }}
 ```
 
 출력 형식: **RFC6902 operations array만**
@@ -99,7 +99,7 @@ human_prompt = """
 
 prompt_template = ChatPromptTemplate.from_messages([
     SystemMessage(system_prompt),
-    HumanMessagePromptTemplate.from_template(human_prompt)
+    HumanMessagePromptTemplate.from_template(human_prompt, template_format="jinja2")
 ])
 
 # json 패치 생성 노드
