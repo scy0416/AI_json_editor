@@ -23,3 +23,7 @@ def strip_code_fences(text: str) -> str:
         text = re.sub(r"^```(?:json|JSON)?\s*", "", text)
         text = re.sub(f"\s*```$", "", text)
     return text.strip()
+
+# 딕서너리를 문자열로 반환
+def safe_json_loads(s: str) -> Any:
+    return json.loads(s)
