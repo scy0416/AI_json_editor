@@ -208,3 +208,40 @@ with left:
                                value="이름을 Bob으로 바꾸고, tags 끝에 'z'를 추가하고, age를 profile/age로 이동해줘.")
 
     run = st.button("🚀 패치 생성 & 적용")
+
+with right:
+    st.subheader("실행 결과")
+
+    if run:
+        # 입력 파싱
+        try:
+            src_obj = json.loads(src_text)
+        except Exception as e:
+            st.error(f"원본 JSON 파싱 실패: {e}")
+            src_obj = None
+
+        # 파싱에 성공한 경우
+        if src_obj is not None:
+            init_state: AppState = {
+                "instruction": instruction,
+                "src": src_obj,
+            }
+            out: AppState = graph.invoke(init_state)
+
+            # 디버그
+            with st.expander("Debug (원시 모델 응답/정리본/trace)"):
+                st.json(out.get("debug") or {})
+
+            # 에러 처리
+            if out.get("error"):
+                st.error(out["error"])
+            else:
+                st.success("패치 생성 및 적용 완료!")
+
+            # 생성된 패치
+            st.subheader("생성된 JSON 패치")
+            st.code(json.dumps(out.get("patch_ops", []), ensure_ascii=False, indent=2), language="json")
+
+            # 적용 결과
+            st.subheader("적용 결과 JSON")
+            st.code(json.dumps(out.get("result", {}), ensure_ascii=False, indent=2), language="json")
