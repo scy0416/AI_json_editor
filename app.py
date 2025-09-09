@@ -187,7 +187,7 @@ with left:
         "name": "Alice",
         "age": 20,
         "tags": ["x", "y"],
-        "profile": {"city", "Seoul"}
+        "profile": {"city": "Seoul"}
     }
     uploaded = st.file_uploader("JSON 업로드(옵션)", type=["json"])
     if "src_text" not in st.session_state:
