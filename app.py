@@ -118,3 +118,11 @@ def generate_patch(state: AppState) -> AppState:
         return {"patch_ops": ops, "debug": {"raw": raw, "cleaned": cleaned}}
     except Exception as e:
         return {"error": f"패치 생성 실패: {e}", "debug": {"trace": traceback.format_exc()}}
+
+# 판단 노드
+def judge(state: AppState) -> AppState:
+    if state.get("error"):
+        return state
+    if not state.get("patch_ops"):
+        return {"error": "생성된 패치가 없습니다."}
+    return state
