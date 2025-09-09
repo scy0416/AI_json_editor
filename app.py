@@ -1,9 +1,9 @@
 import json, re, traceback
 from typing import TypedDict, List, Optional, Dict, Any
 
-import jsonpatch
 import streamlit as st
 
+from langgraph.graph import StateGraph, START, END
 from langchain_core.prompts import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate
@@ -145,3 +145,35 @@ def apply_patch(state: AppState) -> AppState:
         return {"error": f"패치 적용 실패: {e}"}
     except Exception as e:
         return {"error": f"알 수 없는 적용 오류: {e}", "debug": {"trace": traceback.format_exc()}}
+
+# 그래프 생성 함수
+def build_graph():
+    g = StateGraph(AppState)
+    g.add_node("패치 생성", generate_patch)
+    g.add_node("판단", judge)
+    g.add_node("JSON 패치 적용", apply_patch)
+
+    g.add_edge(START, "패치 생성")
+    g.add_edge("패치 생성", "판단")
+
+    # 판단 결과 분기 함수
+    def _route(s: AppState):
+        if s.get("error"):
+            return "end"
+        if s.get("patch_ops"):
+            return "apply"
+        return "end"
+
+    g.add_conditional_edges(
+        "판단",
+        _route,
+        {
+            "apply": "JSON 패치 적용",
+            "end": END
+        }
+    )
+    g.add_edge("JSON 패치 적용", END)
+    return g.compile()
+
+# 그래프 생성
+graph = build_graph()
