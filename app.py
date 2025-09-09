@@ -39,3 +39,4 @@ def validate_patch_ops(ops: Any) -> Optional[str]:
             return f"{i}번째 '{op['op']}' 연산에 'value'가 없습니다."
         if op["op"] in ("move", "copy") and "from" not in op:
             return f"{i}번째 '{op['op']}' 연산에 'from'이 없습니다."
+    return None
