@@ -245,3 +245,20 @@ with right:
             # 적용 결과
             st.subheader("적용 결과 JSON")
             st.code(json.dumps(out.get("result", {}), ensure_ascii=False, indent=2), language="json")
+
+            # 다운로드 버튼
+            col_a, col_b = st.columns(2)
+            with col_a:
+                st.download_button(
+                    "⬇️ 패치(JSON) 다운로드",
+                    data=json.dumps(out.get("patch_ops", []), ensure_ascii=False, indent=2),
+                    file_name="patch.json",
+                    mime="application/json"
+                )
+            with col_b:
+                st.download_button(
+                    "⬇️ 결과(JSON) 다운로드",
+                    data=json.dumps(out.get("result", {}), ensure_ascii=False, indent=2),
+                    file_name="result.json",
+                    mime="application/json"
+                )
